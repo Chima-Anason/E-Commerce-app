@@ -6,6 +6,8 @@ import com.anagraceTech.ecommerce.kafka.OrderConfirmation;
 import com.anagraceTech.ecommerce.kafka.OrderProducer;
 import com.anagraceTech.ecommerce.orderLine.OrderLineRequest;
 import com.anagraceTech.ecommerce.orderLine.OrderLineService;
+import com.anagraceTech.ecommerce.payment.PaymentClient;
+import com.anagraceTech.ecommerce.payment.PaymentRequest;
 import com.anagraceTech.ecommerce.product.ProductClient;
 import com.anagraceTech.ecommerce.product.PurchaseRequest;
 import jakarta.persistence.EntityNotFoundException;
@@ -23,7 +25,7 @@ public class OrderService {
     private final OrderRepository repository;
     private final OrderMapper mapper;
     private final CustomerClient customerClient;
-    //private final PaymentClient paymentClient;
+    private final PaymentClient paymentClient;
     private final ProductClient productClient;
     private final OrderLineService orderLineService;
     private final OrderProducer orderProducer;
@@ -49,14 +51,14 @@ public class OrderService {
                     )
             );
         }
-//        var paymentRequest = new PaymentRequest(
-//                request.amount(),
-//                request.paymentMethod(),
-//                order.getId(),
-//                order.getReference(),
-//                customer
-//        );
-//        paymentClient.requestOrderPayment(paymentRequest);
+        var paymentRequest = new PaymentRequest(
+                request.amount(),
+                request.paymentMethod(),
+                order.getId(),
+                order.getReference(),
+                customer
+        );
+        paymentClient.requestOrderPayment(paymentRequest);
 
         orderProducer.sendOrderConfirmation(
                 new OrderConfirmation(
